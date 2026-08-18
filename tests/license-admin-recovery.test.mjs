@@ -1,0 +1,44 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const licenseBackend = fs.readFileSync(new URL('../supabase/functions/phone-license/index.ts', import.meta.url), 'utf8');
+const aiBackend = fs.readFileSync(new URL('../supabase/functions/phone-ai/index.ts', import.meta.url), 'utf8');
+const migration = fs.readFileSync(new URL('../supabase/migrations/202607230004_license_recovery_codes.sql', import.meta.url), 'utf8');
+const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const adminApp = fs.readFileSync(new URL('../admin/app.js', import.meta.url), 'utf8');
+const adminHtml = fs.readFileSync(new URL('../admin/index.html', import.meta.url), 'utf8');
+
+assert.match(migration, /add column if not exists kind text not null default 'transfer'/);
+assert.match(migration, /add column if not exists phone_friend_id text/);
+assert.match(migration, /create table if not exists public\.phone_license_admin_actions/);
+assert.match(licenseBackend, /\['transfer_create', 'transfer_redeem', 'recovery_create', 'recovery_redeem', 'local_identity_restore'\]\.includes\(action\)/);
+assert.match(licenseBackend, /biometric-required/);
+assert.match(licenseBackend, /action === 'phone_friend_identity_sync'/);
+assert.match(licenseBackend, /\.rpc\('phone_friend_check'/);
+assert.match(aiBackend, /action === "admin_license_users"/);
+assert.match(aiBackend, /action === "admin_license_block"/);
+assert.match(aiBackend, /action === "admin_license_unblock"/);
+assert.match(aiBackend, /Deno\.env\.get\("LICENSE_ADMIN_TOKENS"\)/);
+assert.match(aiBackend, /function requireLicenseAdmin/);
+assert.match(aiBackend, /if \(identity\.role !== "owner"\)/);
+assert.match(aiBackend, /operatorId: labelled \? `admin-\$\{labelled\[1\]\}`/);
+assert.match(aiBackend, /operator_id: identity\.operatorId/);
+assert.match(aiBackend, /\.update\(\{ status: "blocked"/);
+assert.doesNotMatch(aiBackend, /\.from\("phone_license_passkeys"\)\.delete\(\)/);
+assert.doesNotMatch(app, /gateTransferInp|licenseTransferModal|licenseRecoveryModal/);
+assert.match(app, /设备恢复只允许使用本人的人脸或指纹验证/);
+assert.match(app, /licenseSyncPhoneFriendIdentity/);
+assert.match(adminHtml, /用户授权/);
+assert.match(adminHtml, /data-owner-only/);
+assert.match(adminApp, /<b>注册时间<\/b>/);
+assert.match(adminApp, /openUnblockLicense/);
+assert.doesNotMatch(adminApp, /openRecoverLicense|adminRecoveryCode|生成恢复码/);
+assert.match(adminApp, /let canManageOrders = false/);
+assert.match(adminApp, /let canManageLicenses = false/);
+assert.match(adminApp, /document\.querySelectorAll\('\[data-owner-only\]'\)/);
+assert.match(adminApp, /最近管理操作/);
+assert.match(adminApp, /let consecutiveAuthFailures = 0/);
+assert.match(adminApp, /if \(consecutiveAuthFailures < 3\)/);
+assert.match(adminApp, /async function restoreSavedLogin\(\)/);
+
+console.log('license admin recovery tests passed');

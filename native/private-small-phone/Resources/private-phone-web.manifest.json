@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "entry": "小手机.html",
+  "files": [
+    "小手机.html",
+    "app.js",
+    "ai-account.js",
+    "license-gate.js",
+    "commerce-ui.js",
+    "pet-game.js",
+    "pet-game.css",
+    "gift-effects.js",
+    "thought-card-effects.js",
+    "glass-theme.css",
+    "wedding-game.js",
+    "wedding-game.css",
+    "icon.png"
+  ],
+  "directories": [
+    "assets/incoming-wechat-call-default-v2.mp3",
+    "assets/message-notification-user-v1.mp3",
+    "assets/pet-room-v1.webp",
+    "assets/wedding/modern-v1",
+    "assets/wedding/chinese-v1",
+    "assets/app-icons/glass/black",
+    "assets/app-icons/glass/gray",
+    "assets/app-icons/glass/pink",
+    "assets/app-icons/glass/blue",
+    "vendor",
+    "fonts"
+  ]
+}
